@@ -16,14 +16,14 @@ const Bodies=Matter.Bodies;
 
 const Render=Matter.Render;
 
-var balloon,ball,bg,bg_img;
+var balloon,ball,bg,bg_img,heading_img,head,home_img,homeS,play_img,play;
 var c=300;
 var lay=[];
 // gameStates
 
-var gameState = "l1";
+var gameState = "homeScreen";
 var flag=0;
-var mode = "start";
+
 
 // common variable declartion
 
@@ -39,14 +39,41 @@ var mode = "start";
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // function preload to load images
 
 function preload()
 {
 
    bg_img =  loadImage("images/bg.png");
-
+   heading_img =loadImage("images/heading.png");
+   home_img= loadImage("images/homeScreen.png");
+   play_img= loadImage("images/play.png");
 }
+
+
+
+
+
+
+
+
+
+
 
 
 // function setup 
@@ -60,6 +87,8 @@ function setup()
 
     world=engine.world;
      
+    //render function
+
     var render=Render.create({
         element: document.body,
         engine: engine,
@@ -68,68 +97,75 @@ function setup()
             height: 700,
             wireframes: false
         }
-    });
+    }
+    
+    );
+   
+   
+   
     Render.run(render);
 
-
+    //sprites
 
     balloon =new Balloon(300, 600);
 
     ball = new Ball(300,450,40);
     
-    bg = createSprite(300,300,600,700);
-    bg.scale=1.5;
-    bg.y =bg.height;
+    // bg = createSprite(300,300,600,700);
+    // bg.scale=1.5;
+    // bg.y =bg.height;
     
-    bg.addImage("background",bg_img);
+    // bg.addImage("background",bg_img);
 
- // obs1();
+    
 
-   //obs2();
 
   
 }
 
 
 
-// function to loof]p the background image 
+
+
+
+
+
+   
+
+
+
+
+
+
+
+
+
+
+// function to loop the background image 
 
 
 function bgLoop()
 { 
 
-    bg.velocityY=2;
 
-    if(bg.y>600)
-    {
-
-        bg.y =400;
-        
-    }
 
 }
 
 
-function gameOver()
-{
-   World.remove(world,balloon.body);
- 
-   World.remove(world,ball.body);
 
 
-    textSize(30);
-    stroke(3);
-    fill('green');
-    text("CRASH",500,200);
 
-  
-}
+
+
+
 
 
 /* this series of function will be used to create 
 different predefined obstacle series for 
 different levels 
 */
+
+
 
 function obs1()
 {
@@ -140,6 +176,30 @@ function obs1()
     }
 }
 
+
+//display function for obs1
+function dispobs1()
+{
+    
+    for(var w=0;w<lay.length;w++)
+    {
+        lay[w].display();
+        var collision = Matter.SAT.collides(balloon.body,lay[w].body);
+        if(collision.collided)
+        {
+            gameState="crash"
+
+        }
+    }
+    
+}
+
+
+
+
+
+
+
 function obs2()
 {
 
@@ -148,29 +208,16 @@ function obs2()
    for (var i =0; i<10; i++)
     {
         slabs[i] = new Quad(300,-50+(i*20),500,10)
-      //   console.log("in slabs");
+     
          balls[i] = new Circle(230+(i+2*30),-150,15)
-        // console.log("in balls");
+       
              
     }
 
 }
-//display function for all obstacles
-function dispobs1()
-{
-    //console.log(lay[0].body);
-    for(var w=0;w<lay.length;w++)
-    {
-        lay[w].display();
-        var collision = Matter.SAT.collides(balloon.body,lay[w].body);
-        if(collision.collided)
-        {
-        flag=1;
 
-        }
-    }
-    
-}
+//display for obs2
+
 function dispobs2()
 {
     for (var x =0; x<slabs.length; x++)
@@ -182,11 +229,18 @@ function dispobs2()
         var collision2 = Matter.SAT.collides(balloon.body,balls[x].body);
         if(collision.collided||collision2.collided)
         {
-        flag=1;
+            gameState="crash"
         }
   
     }
 }
+
+
+
+
+
+
+
 
 
 
@@ -211,11 +265,73 @@ function dispobs3()
        
         if(collision.collided)
         {
-        flag=1;
+            gameState="crash"
         }
   
     }
 }
+
+
+// this function creates a home screen
+
+function home()
+{
+ 
+    homeS =  createSprite(300,390);
+    homeS.addImage("homeScreen",home_img)
+
+
+    head = createSprite(300.5,60);
+    head.addImage("heading",heading_img);
+
+    play = createSprite(450,570);
+    play.addImage("playing",play_img);
+
+    if (mousePressedOver(play))
+    {
+        gameState ="play";
+       // redraw();
+        console.log(gameState);
+    
+ 
+    bg = createSprite(300,300,600,700);
+    bg.scale=1.5;
+    bg.y =bg.height;
+    
+    bg.addImage("background",bg_img);
+
+    bg.velocityY=2;
+
+    if(bg.y>600)
+    {
+
+        bg.y =400;
+        
+    }
+
+    }
+
+}
+
+
+//function for game over
+
+function gameOver()
+{
+   World.remove(world,balloon.body);
+ 
+   World.remove(world,ball.body);
+
+ 
+  
+ console.log("in crash")
+   bg.velocityY=0;
+  
+}
+
+
+
+
 
 
 
@@ -230,46 +346,74 @@ function draw()
     background(0); 
 
     Engine.update(engine); 
+   
+if (gameState==="homeScreen")
+{
+   home();
+}
+drawSprites();
 
-    bgLoop();
 
-    drawSprites();
+
+
+
+    if(gameState==="play"){
+console.log("yes")
+
+        // if( frameCount===75)
+        // {
+        //     fill("red");
+        //     textSize(10);
+        //     text("1",300,350);
+            
+        // }  
+    
+   // bgLoop();
+    
+
+   
 
     ball.display();
 
     balloon.display();
     
+       
+    
         dispobs1();
-      
-
         dispobs2();
         dispobs3();
+
+
+
+
     if( frameCount===100)
     {
         obs1();  
-      //  console.log("in 1")
+      
         
     }  
     if(frameCount===300)
     {
         obs2();
-        //console.log("in 2")
+       
        
        
     }
         if(frameCount===500)
     {
         obs3();
-        //console.log("in 2")
+       
        
     }
-    if (flag===1)
+    if (gameState==="crash")
     {
+        
         gameOver();
 
     }
+}
 
-        //dispobs2();
+        
         
 }
 

@@ -6,15 +6,16 @@ class Ball
     {
         var options = 
         {
-            'isStatic': false,
-            'restitution':0.1,
-            'friction':0.1,
-            'density':4,
+            isStatic: false,
+           
+           // friction:0,
+            frictionAir: 0.0005,
+            density:1,
             
         }
     this.body = Bodies.circle(x, y, radius, options);
     this.image= loadImage("images/ball.png");
-    
+    this.visibility=255;
     Matter.Body.setMass(this.body,this.body.mass*50);
 
     this.radius = radius;
@@ -30,6 +31,10 @@ class Ball
           translate(this.body.position.x, this.body.position.y);
           rotate(angle);
           imageMode(CENTER);
+          if(gameState==="crash"){
+          this.visibility=this.visibility-5;
+          tint(255,this.visibility);}
+          
           
           image(this.image,0, 0,this.radius,this.radius);
           pop();
